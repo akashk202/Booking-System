@@ -9,6 +9,8 @@ const bookingRoutes = require('./routes/bookingRoutes');
 const emailHelper = require('./controls/emailHelper');
 require('dotenv').config();
 
+///this is a comment to test github
+
 dotenv.config();
 
 const app = express();
