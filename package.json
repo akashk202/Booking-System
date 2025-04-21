@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^5.1.0",
     "googleapis": "^148.0.0",
@@ -17,6 +18,8 @@
     "mongoose": "^8.13.2",
     "nodemailer": "^6.10.0",
     "nodemon": "^3.1.9",
-    "pdfmake": "^0.2.18"
+    "pdfmake": "^0.2.18",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   }
 }

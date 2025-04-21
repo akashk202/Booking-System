@@ -33,7 +33,7 @@ router.post('/register-admin', async (req, res) => {
     await newUser.save();
 
     const jwt = require('jsonwebtoken');
-    const JWT_SECRET = process.env.JWT_SECRET || 'secretkey';
+    const JWT_SECRET = process.env.JWT_SECRET || 'akash@172002';
     const token = jwt.sign({ id: newUser._id, role: newUser.role }, JWT_SECRET, { expiresIn: '7d' });
 
     res.status(201).json({ token, message: 'Admin registered' });

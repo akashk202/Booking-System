@@ -3,10 +3,14 @@ const router = express.Router();
 const User = require('../models/User');
 const { authenticateToken } = require('../middleware/authenticateToken');
 
-router.post('/', authenticateToken, async (req, res) => {
+rrouter.post('/', authenticateToken, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
-    const newAddress = { ...req.body, isActive: user.addresses.length === 0 };
+    const newAddress = { 
+      ...req.body,
+      isActive: user.addresses.length === 0
+    };
+    
     user.addresses.push(newAddress);
     await user.save();
     res.status(201).json(newAddress);
@@ -15,18 +19,70 @@ router.post('/', authenticateToken, async (req, res) => {
   }
 });
 
-router.put('/update', authenticateToken, async (req, res) => {
+// Update existing address
+router.put('/:addressId', authenticateToken, async (req, res) => {
   try {
-    const updated = await Address.findOneAndUpdate(
-      { user: req.user.id },
-      { $set: req.body },
-      { new: true, upsert: true }
-    );
+    const user = await User.findById(req.user.id);
+    const address = user.addresses.id(req.params.addressId);
+    
+    if (!address) return res.status(404).json({ message: 'Address not found' });
+    
+    Object.assign(address, req.body);
+    await user.save();
+    res.json(address);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
-    res.status(200).json({ message: 'Address updated', address: updated });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+// Set address as active
+router.patch('/:addressId/set-active', authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    user.addresses.forEach(addr => addr.isActive = false);
+    
+    const address = user.addresses.id(req.params.addressId);
+    if (!address) return res.status(404).json({ message: 'Address not found' });
+    
+    address.isActive = true;
+    await user.save();
+    res.json(address);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get all addresses
+router.get('/', authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    res.json(user.addresses);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Delete address
+router.delete('/:addressId', authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    const address = user.addresses.id(req.params.addressId);
+    
+    if (!address) return res.status(404).json({ message: 'Address not found' });
+    
+    const wasActive = address.isActive;
+    address.remove();
+    
+    if (wasActive && user.addresses.length > 0) {
+      user.addresses[0].isActive = true;
+    }
+    
+    await user.save();
+    res.json({ message: 'Address deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 
 module.exports = router;
+

@@ -8,6 +8,8 @@ const roomRoutes = require('./routes/roomRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const emailHelper = require('./controls/emailHelper');
 require('dotenv').config();
+const cors = require('cors');
+
 
 ///this is a comment to test github
 
@@ -15,6 +17,7 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 mongoose.connect(process.env.MONGO_URI || 'mongodb+srv://akashkrishna389:pb0GTD9lkMnLMG14@cluster0.40h1aa8.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {
   useNewUrlParser: true,
