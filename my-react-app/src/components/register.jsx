@@ -1,58 +1,61 @@
 import { useState } from 'react';
 
 function Register() {
-  const [formData, setFormData] = useState({ name: '', email: '', phone: '', password: '' });
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    password: '',
+  });
   const [message, setMessage] = useState('');
   const [variant, setVariant] = useState('');
 
-  // Handle input change
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
-  // Basic validation checks
+
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in)$/;
+    const phoneRegex = /^[0-9]{10}$/; 
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).{5,}$/;
+    const name = formData.name.trim(); 
+    const nameRegex = /^[A-Za-z][A-Za-z\s]{4,}$/;
+
   const validateForm = () => {
-    const { name, email, phone, password } = formData;
-
-    // Name validation: should contain only alphabetic characters
-    const nameRegex = /^[A-Za-z\s]+$/;
-    if (!name || !nameRegex.test(name)) {
+    const errors = {};
+    
+    if (!name) {
+      errors.name = "Name cannot be empty or just spaces.";
+    } else if (!nameRegex.test(name)) {
+      errors.name = "Name must be at least 5 characters, start with a letter, and only contain letters and spaces.";
+    } else if (/(\w)\1\1/.test(name)) {
+      errors.name = "Name cannot contain the same character repeated 3 times in a row.";
+    }
+  
+    if (!formData.email || !emailRegex.test(formData.email)) {
+      errors.email = "Invalid email format.";
+    }
+  
+    if (!formData.phone || !phoneRegex.test(formData.phone)) {
+      errors.phone = "Phone must contain only numbers.";
+    }
+  
+    if (!formData.password || !passwordRegex.test(formData.password)) {
+      errors.password = "Password must be at least 5 characters long, include letters, a number, and a symbol.";
+    }
+  
+    if (Object.keys(errors).length > 0) {
+      // Optional: Set error messages in state
+      setMessage(Object.values(errors)[0]); // Show the first error
       setVariant('danger');
-      setMessage('Name must only contain letters and spaces');
       return false;
     }
-
-    // Email validation: should contain @ symbol
-    const emailRegex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
-    if (!email || !emailRegex.test(email)) {
-      setVariant('danger');
-      setMessage('Please enter a valid email address');
-      return false;
-    }
-
-    // Phone validation: should contain only numbers
-    const phoneRegex = /^[0-9]+$/;
-    if (!phone || !phoneRegex.test(phone)) {
-      setVariant('danger');
-      setMessage('Phone number should only contain digits');
-      return false;
-    }
-
-    // Password validation: should contain at least one letter, one number, and one symbol
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
-    if (!password || !passwordRegex.test(password)) {
-      setVariant('danger');
-      setMessage('Password must contain at least one letter, one number, and one special character');
-      return false;
-    }
-
+  
     return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Perform form validation
     if (!validateForm()) return;
 
     try {
@@ -65,81 +68,94 @@ function Register() {
       const data = await res.json();
 
       if (res.ok) {
-        // Registration was successful, store the token
         localStorage.setItem('token', data.token);
         setVariant('success');
         setMessage('Registration successful!');
       } else {
-        // Show error message if registration fails
         setVariant('danger');
         setMessage(data.message || 'Registration failed');
       }
     } catch (err) {
-      // Catch network or server errors
       setVariant('danger');
       setMessage('Error connecting to the server.');
     }
   };
 
   return (
-    <div className="container mt-5">
-      <h2>Register</h2>
-      {message && <div className={`alert alert-${variant}`} role="alert">{message}</div>}
-      <form onSubmit={handleSubmit} className="needs-validation" noValidate>
-        <div className="mb-3">
-          <label htmlFor="name" className="form-label">Name</label>
-          <input
-            type="text"
-            className="form-control"
-            id="name"
-            name="name"
-            required
-            value={formData.name}
-            onChange={handleChange}
-          />
-        </div>
+    <div
+      className="container d-flex justify-content-center align-items-center"
+      style={{ minHeight: '80vh' }}
+    >
+      <div
+        className="p-4 shadow rounded bg-white"
+        style={{ maxWidth: '400px', width: '100%' }}
+      >
+        <h3 className="text-center mb-4" style={{ color: '#343a40' }}>Register</h3>
 
-        <div className="mb-3">
-          <label htmlFor="email" className="form-label">Email address</label>
-          <input
-            type="email"
-            className="form-control"
-            id="email"
-            name="email"
-            required
-            value={formData.email}
-            onChange={handleChange}
-          />
-        </div>
+        {message && (
+          <div className={`alert alert-${variant}`} role="alert">
+            {message}
+          </div>
+        )}
 
-        <div className="mb-3">
-          <label htmlFor="phone" className="form-label">Phone</label>
-          <input
-            type="text"
-            className="form-control"
-            id="phone"
-            name="phone"
-            required
-            value={formData.phone}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="mb-3">
-          <label htmlFor="password" className="form-label">Password</label>
-          <input
-            type="password"
-            className="form-control"
-            id="password"
-            name="password"
-            required
-            value={formData.password}
-            onChange={handleChange}
-          />
-        </div>
-
-        <button type="submit" className="btn btn-primary">Register</button>
-      </form>
+        <form onSubmit={handleSubmit} noValidate>
+          <div className="mb-3">
+            <input
+              type="text"
+              name="name"
+              placeholder="Full Name"
+              className="form-control"
+              style={{ borderRadius: '0.5rem' }}
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="mb-3">
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              className="form-control"
+              style={{ borderRadius: '0.5rem' }}
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="mb-3">
+            <input
+              type="text"
+              name="phone"
+              placeholder="Phone"
+              className="form-control"
+              style={{ borderRadius: '0.5rem' }}
+              value={formData.phone}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="mb-3">
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              className="form-control"
+              style={{ borderRadius: '0.5rem' }}
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            className="btn btn-warning w-100 text-white fw-bold"
+            style={{ borderRadius: '0.5rem' }}
+          >
+            Register
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

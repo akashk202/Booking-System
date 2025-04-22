@@ -3,28 +3,35 @@ import { Link } from 'react-router-dom';
 
 function Layout({ children }) {
   return (
-    <div className="d-flex flex-column min-vh-100">
+    <div className="d-flex flex-column min-vh-100 bg-light">
       {/* Navbar */}
-      <nav className="navbar navbar-expand-lg navbar-light bg-light px-4">
-        <Link to="/" className="navbar-brand">EasyBooking.com</Link>
+      <nav className="navbar navbar-expand-lg border-bottom shadow-sm px-4 bg-white">
+        <Link to="/" className="navbar-brand fw-bold text-dark fs-4">
+          Easy<span className="text-warning">Booking</span>.com
+        </Link>
 
-        {/* Register and Login buttons positioned at the top-right corner */}
-        <div className="navbar-nav ms-auto">
-          <Link to="/register" className="nav-link custom-btn">Register</Link>
-          <Link to="/login" className="nav-link custom-btn">Login</Link>
+        <div className="ms-auto d-flex gap-3">
+          <Link to="/register" className="btn btn-outline-warning">
+            Register
+          </Link>
+          <Link to="/login" className="btn btn-warning text-white">
+            Login
+          </Link>
         </div>
       </nav>
 
-      {/* Main content area */}
-      <main className="flex-grow-1 d-flex justify-content-center align-items-center">
+      {/* Main content */}
+      <main className="flex-grow-1 d-flex justify-content-center align-items-center p-4">
         <div className="container text-center">
           {children}
         </div>
       </main>
 
-      {/* Optional Footer */}
-      <footer className="bg-light text-center py-3 mt-auto">
-        <small>&copy; {new Date().getFullYear()} EasyBooking.com</small>
+      {/* Footer */}
+      <footer className="text-center py-3 bg-white border-top">
+        <small className="text-muted">
+          &copy; {new Date().getFullYear()} Easy<span className="text-warning">Booking</span>.com
+        </small>
       </footer>
     </div>
   );

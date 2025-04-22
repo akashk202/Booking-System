@@ -3,10 +3,23 @@ const router = express.Router();
 const { authenticateToken, checkAdmin } = require('../middleware/authenticateToken');
 const Room = require('../models/Room');
 const User = require('../models/User');
+const upload = require('../middleware/upload');
 
-router.post('/room', authenticateToken, checkAdmin, async (req, res) => {
+
+
+router.post('/room', authenticateToken, checkAdmin, upload.single('image'), async (req, res) => {
   try {
-    const room = new Room(req.body);
+    const { name, location, description, price, capacity } = req.body;
+
+    const room = new Room({
+      name,
+      location,
+      description,
+      price,
+      capacity,
+      image: req.file ? req.file.filename : null,
+    });
+
     await room.save();
     res.status(201).json(room);
   } catch (err) {
@@ -41,5 +54,43 @@ router.post('/register-admin', async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
+router.put('/room/:id', authenticateToken, checkAdmin, upload.single('image'), async (req, res) => {
+  try {
+    const { name, location, description, price, capacity } = req.body;
+    const updateData = {
+      name,
+      location,
+      description,
+      price,
+      capacity,
+    };
+
+    if (req.file) {
+      updateData.image = req.file.filename;
+    }
+
+    const updatedRoom = await Room.findByIdAndUpdate(req.params.id, updateData, { new: true });
+
+    if (!updatedRoom) {
+      return res.status(404).json({ message: 'Room not found' });
+    }
+
+    res.status(200).json(updatedRoom);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+router.get('/rooms', async (req, res) => {
+  try {
+    const rooms = await Room.find();
+    res.status(200).json(rooms);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch rooms' });
+  }
+});
+
+
 
 module.exports = router;

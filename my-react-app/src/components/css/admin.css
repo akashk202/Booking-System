@@ -1,0 +1,206 @@
+/* admin.css */
+
+/* General container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* Admin panel header */
+  h2, h4 {
+    text-align: center;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  /* Alert messages */
+  .alert {
+    margin-top: 20px;
+  }
+  
+  .alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+  }
+  
+  .alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+  
+  .alert-success {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  /* Form styles */
+  .form-label {
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .form-control {
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    padding: 10px;
+    font-size: 1rem;
+  }
+  
+  .form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+  
+  /* Buttons */
+  .btn {
+    font-size: 1rem;
+    padding: 10px 15px;
+    border-radius: 5px;
+  }
+  
+  .btn-primary {
+    background-color: #ffcc00;
+    border-color: #ffcc00;
+    color: #000;
+  }
+  
+  .btn-primary:hover {
+    background-color: #e6b800;
+    border-color: #e6b800;
+  }
+  
+  .btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+  }
+  
+  .btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+  }
+  
+  .btn-outline-warning {
+    border-color: #ffc107;
+    color: #ffc107;
+  }
+  
+  .btn-outline-warning:hover {
+    background-color: #ffc107;
+    color: #000;
+  }
+  
+  /* Card styling for user list, rooms, and admin registration */
+  .card {
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .card-body {
+    padding: 15px;
+  }
+  
+  .card-title {
+    font-size: 1.5rem;
+    color: #333;
+  }
+  
+  .card-text {
+    font-size: 1rem;
+    color: #555;
+  }
+  
+  .card-img-top {
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 5px;
+  }
+  
+  /* User list */
+  .list-group-item {
+    font-size: 1rem;
+    padding: 15px;
+    background-color: #f8f9fa;
+  }
+  
+  .list-group-item:hover {
+    background-color: #f1f1f1;
+  }
+  
+  .badge {
+    font-size: 0.9rem;
+    padding: 5px 10px;
+    border-radius: 12px;
+  }
+  
+  .badge.bg-secondary {
+    background-color: #6c757d;
+  }
+  
+  /* Form sections */
+  .mb-3 {
+    margin-bottom: 20px;
+  }
+  
+  .mt-4 {
+    margin-top: 40px;
+  }
+  
+  .mt-2 {
+    margin-top: 10px;
+  }
+  
+  .shadow-sm {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* File input */
+  input[type="file"] {
+    border: 1px solid #ced4da;
+    padding: 10px;
+    border-radius: 8px;
+  }
+  
+  input[type="file"]:focus {
+    border-color: #007bff;
+  }
+  
+  /* Edit room section */
+  form > .mb-3 input {
+    width: 100%;
+    font-size: 1rem;
+    padding: 10px;
+  }
+  
+  button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  /* Responsive styling */
+  @media (max-width: 767px) {
+    .card {
+      margin-bottom: 15px;
+    }
+  
+    .form-control {
+      font-size: 0.9rem;
+    }
+  
+    .card-img-top {
+      max-height: 150px;
+    }
+  
+    .card-body {
+      padding: 10px;
+    }
+  
+    .btn {
+      font-size: 0.9rem;
+    }
+  }
+  

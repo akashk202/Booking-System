@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-
+import './css/admin.css';
 function Admin() {
   const [users, setUsers] = useState([]);
-  const [roomData, setRoomData] = useState({ name: '', description: '', price: '' });
+  const [roomData, setRoomData] = useState({ name: '', location:'', description: '',capacity: '', price: '' });
+  const [roomImage, setRoomImage] =useState(null);
   const [adminData, setAdminData] = useState({ name: '', email: '', phone: '', password: '' });
   const [message, setMessage] = useState('');
   const [variant, setVariant] = useState('info');
   const [loading, setLoading] = useState(false);
+  const [editingRoom, setEditingRoom] = useState(null);
+  const [rooms, setRooms] = useState([]);
+
+
 
   const token = localStorage.getItem('token');
 
@@ -43,23 +48,53 @@ function Admin() {
     }
   };
 
+  const fetchRooms = async () => {
+    try {
+      const res = await fetch('http://localhost:3000/api/admin/rooms', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setRooms(data);
+      } else {
+        setMessage(data.message || 'Failed to fetch rooms');
+        setVariant('danger');
+      }
+    } catch (err) {
+      setMessage('Failed to fetch rooms');
+      setVariant('danger');
+    }
+  };
+  
+
   // Create a new room
   const createRoom = async (e) => {
     e.preventDefault();
     try {
+      const formData = new FormData();
+      formData.append('name', roomData.name);
+      formData.append('location', roomData.location);
+      formData.append('description', roomData.description);
+      formData.append('capacity', roomData.capacity);
+      formData.append('price', roomData.price);
+      if (roomImage) formData.append('image', roomImage); // Append image
+  
       const res = await fetch('http://localhost:3000/api/admin/room', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(roomData),
+        body: formData,
       });
+  
       const data = await res.json();
       if (res.ok) {
         setVariant('success');
         setMessage('✅ Room created successfully!');
-        setRoomData({ name: '', description: '', price: '' });
+        setRoomData({ name: '', location: '', description: '', capacity: '' ,price: ''});
+        setRoomImage(null); 
       } else {
         setVariant('danger');
         setMessage(data.message || 'Failed to create room');
@@ -69,6 +104,44 @@ function Admin() {
       setMessage('Failed to create room');
     }
   };
+
+  const updateRoom = async (e) => {
+    e.preventDefault();
+    try {
+      const formData = new FormData();
+      formData.append('name', editingRoom.name);
+      formData.append('location', editingRoom.location);
+      formData.append('description', editingRoom.description);
+      formData.append('price', editingRoom.price);
+      formData.append('capacity', editingRoom.capacity);
+      if (editingRoom.imageFile) {
+        formData.append('image', editingRoom.imageFile);
+      }
+  
+      const res = await fetch(`http://localhost:3000/api/admin/room/${editingRoom._id}`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+  
+      const data = await res.json();
+      if (res.ok) {
+        setMessage('✅ Room updated!');
+        setVariant('success');
+        setEditingRoom(null);
+        fetchRooms(); // <-- Refresh the room list
+      } else {
+        setMessage(data.message || 'Update failed');
+        setVariant('danger');
+      }
+    } catch (err) {
+      setMessage('Update error');
+      setVariant('danger');
+    }
+  };
+  
 
   // Register a new admin
   const registerAdmin = async (e) => {
@@ -98,6 +171,7 @@ function Admin() {
 
   useEffect(() => {
     fetchUsers();
+    fetchRooms();;
   }, []);
 
   return (
@@ -109,44 +183,153 @@ function Admin() {
           {message}
         </div>
       )}
+  
 
-      {/* Create Room */}
-      <div className="card p-4 mb-5 shadow-sm">
-        <h4 className="mb-3">📦 Create New Room</h4>
-        <form onSubmit={createRoom}>
-          <div className="mb-3">
-            <label className="form-label">Room Name</label>
-            <input
-              type="text"
-              className="form-control"
-              value={roomData.name}
-              onChange={(e) => setRoomData({ ...roomData, name: e.target.value })}
-              required
-            />
-          </div>
-          <div className="mb-3">
-            <label className="form-label">Description</label>
-            <input
-              type="text"
-              className="form-control"
-              value={roomData.description}
-              onChange={(e) => setRoomData({ ...roomData, description: e.target.value })}
-              required
-            />
-          </div>
-          <div className="mb-3">
-            <label className="form-label">Price</label>
-            <input
-              type="number"
-              className="form-control"
-              value={roomData.price}
-              onChange={(e) => setRoomData({ ...roomData, price: e.target.value })}
-              required
-            />
-          </div>
-          <button className="btn btn-primary" disabled={loading}>Create Room</button>
-        </form>
+  <form onSubmit={createRoom} encType="multipart/form-data">
+  <div className="mb-3">
+    <label className="form-label">Room Name</label>
+    <input
+      type="text"
+      className="form-control"
+      value={roomData.name}
+      onChange={(e) => setRoomData({ ...roomData, name: e.target.value })}
+      required
+    />
+  </div>
+
+  <div className="mb-3">
+    <label className="form-label">Location</label>
+    <input
+      type="text"
+      className="form-control"
+      value={roomData.location}
+      onChange={(e) => setRoomData({ ...roomData, location: e.target.value })}
+      required
+    />
+  </div>
+
+  <div className="mb-3">
+    <label className="form-label">Description</label>
+    <input
+      type="text"
+      className="form-control"
+      value={roomData.description}
+      onChange={(e) => setRoomData({ ...roomData, description: e.target.value })}
+      required
+    />
+  </div>
+
+
+  <div className="mb-3">
+    <label className="form-label">Capacity</label>
+    <input
+      type="number"
+      className="form-control"
+      value={roomData.capacity}
+      onChange={(e) => setRoomData({ ...roomData, capacity: e.target.value })}
+      required
+    />
+  </div>
+
+  <div className="mb-3">
+    <label className="form-label">Price</label>
+    <input
+      type="number"
+      className="form-control"
+      value={roomData.price}
+      onChange={(e) => setRoomData({ ...roomData, price: e.target.value })}
+      required
+    />
+  </div>
+
+  
+
+  <div className="mb-3">
+    <label className="form-label">Room Image</label>
+    <input
+      type="file"
+      className="form-control"
+      accept="image/*"
+      onChange={(e) => setRoomImage(e.target.files[0])}
+    />
+  </div>
+
+  <button className="btn btn-primary" disabled={loading}>Create Room</button>
+</form>
+
+{isAdmin && editingRoom && (
+  <form onSubmit={updateRoom} encType="multipart/form-data" className="mt-4">
+    <h5>✏️ Edit Room</h5>
+
+    <input
+      type="text"
+      className="form-control mb-2"
+      value={editingRoom.name}
+      onChange={(e) => setEditingRoom({ ...editingRoom, name: e.target.value })}
+    />
+    <input
+      type="text"
+      className="form-control mb-2"
+      value={editingRoom.location}
+      onChange={(e) => setEditingRoom({ ...editingRoom, location: e.target.value })}
+    />
+    <input
+      type="text"
+      className="form-control mb-2"
+      value={editingRoom.description}
+      onChange={(e) => setEditingRoom({ ...editingRoom, description: e.target.value })}
+    />
+    <input
+      type="number"
+      className="form-control mb-2"
+      value={editingRoom.capacity}
+      onChange={(e) => setEditingRoom({ ...editingRoom, capacity: e.target.value })}
+    />
+    <input
+      type="number"
+      className="form-control mb-2"
+      value={editingRoom.price}
+      onChange={(e) => setEditingRoom({ ...editingRoom, price: e.target.value })}
+    />
+    <input
+      type="file"
+      className="form-control mb-2"
+      accept="image/*"
+      onChange={(e) => setEditingRoom({ ...editingRoom, imageFile: e.target.files[0] })}
+    />
+    <button className="btn btn-success mt-2">Update Room</button>
+  </form>
+)}
+<div className="row">
+{rooms.map((room) => (
+  <div key={room._id || room.name}className="col-12 col-md-4 mb-4">
+    <div className="card">
+      <img
+        src={`http://localhost:3000/uploads/${room.image}`}
+        alt={room.name}
+        className="card-img-top"
+      />
+      <div className="card-body">
+        <h5 className="card-title">{room.name}</h5>
+        <p className="card-text">{room.description}</p>
+        <p className="card-text">📍 {room.location}</p>
+        <p className="card-text">💰 ${room.price}</p>
+        <p className="card-text">👥 Capacity: {room.capacity}</p>
+        
+        {/* Ensure this part is rendering properly */}
+        {isAdmin && (
+          <button
+            className="btn btn-sm btn-outline-warning mt-2"
+            onClick={() => setEditingRoom(room)}
+          >
+            Edit
+          </button>
+        )}
       </div>
+    </div>
+  </div>
+))}
+</div>
 
       {/* Register Admin */}
       <div className="card p-4 mb-5 shadow-sm">

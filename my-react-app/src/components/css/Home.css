@@ -1,0 +1,126 @@
+/* General Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Room list grid layout */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+}
+
+/* Room card styling */
+.room-card {
+  background-color: #ffffff; /* White background for cleaner look */
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  border: none; /* No border to make it cleaner */
+  font-family: 'Roboto', sans-serif; /* Use a modern font */
+  cursor: pointer;
+  max-width: 100%;
+  margin: 0 auto;
+  transform-origin: center; /* Ensure smooth hover scaling */
+}
+
+/* Hover effect for room card */
+.room-card:hover {
+  transform: translateY(-5px) scale(1.02); /* Subtle scaling effect */
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1); /* More intense shadow */
+}
+
+/* Room image styling */
+.room-image {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 10px 10px 0 0; /* Rounded top corners */
+}
+
+/* Room content (description, price) */
+.card-body {
+  padding: 1.5rem;
+  background-color: #fafafa; /* Light background for readability */
+  color: #333;
+}
+
+.card-title {
+  color: #ff9800; /* Softer orange color for room title */
+  margin-bottom: 0.5rem;
+  font-size: 1.4rem; /* Larger font size for headings */
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.card-body p {
+  margin: 0.5rem 0;
+  font-size: 1rem; /* Clear and readable text size */
+  line-height: 1.7; /* Increase line height for better readability */
+  color: #555; /* Softer color for description text */
+}
+
+.card-body .price {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #000;
+  margin-top: 1rem;
+}
+
+.card-body .location, .card-body .capacity {
+  font-size: 1rem;
+  color: #777; /* Lighter color for secondary info */
+}
+
+.card-body .description {
+  font-size: 0.95rem;
+  color: #444;
+  margin-top: 1rem;
+}
+
+/* Alert message styling */
+.alert {
+  background-color: #ffcccc;
+  color: #c0392b;
+  padding: 1rem;
+  margin-bottom: 2rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  text-align: center;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .room-card {
+    border-radius: 8px;
+    padding: 1rem;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  .card-title {
+    font-size: 1.3rem;
+  }
+
+  .card-body p {
+    font-size: 0.9rem;
+  }
+
+  .card-body .price {
+    font-size: 1.1rem;
+  }
+
+  .row {
+    gap: 1.5rem;
+    justify-content: center;
+  }
+}
