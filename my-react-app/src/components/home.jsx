@@ -31,8 +31,12 @@ function Home() {
 
   // Handle click on room card
   const handleRoomClick = (room) => {
-    // Always redirect to login page when a room card is clicked
-    navigate('/login', { state: { room } });
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+      navigate('/booking', { state: { room } });
+    } else {
+      navigate('/login', { state: { room } });
+    }
   };
 
   return (
@@ -47,7 +51,7 @@ function Home() {
               <div
                 className="card mb-4 room-card"
                 style={{ maxWidth: '400px' }}
-                onClick={() => handleRoomClick(room)}  // Handling room click to force login redirect
+                onClick={() => handleRoomClick(room)}
               >
                 <img
                   src={`http://localhost:3000/uploads/${room.image}`}

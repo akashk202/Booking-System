@@ -6,13 +6,10 @@ const adminRoutes = require('./routes/adminRoutes');
 const userRoutes = require('./routes/userRoutes');
 const roomRoutes = require('./routes/roomRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
-const emailHelper = require('./controls/emailHelper');
 require('dotenv').config();
 const cors = require('cors');
 const path =require('path');
 
-
-///this is a comment to test github
 
 dotenv.config();
 

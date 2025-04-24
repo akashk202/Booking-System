@@ -1,11 +1,16 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { useAuth} from '../components/AuthContext';
 
 function Login() {
+  const {setUser} = useAuth();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [message, setMessage] = useState('');
   const [variant, setVariant] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/dashboard';
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -40,10 +45,11 @@ function Login() {
 
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(user));
+        setUser(user);
 
         setVariant('success');
         setMessage('Login successful! Redirecting...');
-        setTimeout(() => navigate('/dashboard'), 1500);
+        setTimeout(() => navigate(from), 1500);;
       } else {
         setVariant('danger');
         setMessage(data.message || 'Login failed');

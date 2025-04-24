@@ -3,7 +3,7 @@ const router = express.Router();
 const User = require('../models/User');
 const { authenticateToken } = require('../middleware/authenticateToken');
 
-rrouter.post('/', authenticateToken, async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     const newAddress = { 

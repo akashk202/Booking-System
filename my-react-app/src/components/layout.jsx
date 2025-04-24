@@ -1,7 +1,29 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useAuth } from '../components/AuthContext';
 
 function Layout({ children }) {
+  const { user, setUser } = useAuth(); // Get user and setUser from context
+  const navigate = useNavigate();
+
+  // Optional: Load user from localStorage on initial render
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser && !user) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, [setUser, user]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    setUser(null); // Update context
+    toast.success('Logged out successfully!');
+    navigate('/login');
+  };
+
   return (
     <div className="d-flex flex-column min-vh-100 bg-light">
       {/* Navbar */}
@@ -11,12 +33,14 @@ function Layout({ children }) {
         </Link>
 
         <div className="ms-auto d-flex gap-3">
-          <Link to="/register" className="btn btn-outline-warning">
-            Register
-          </Link>
-          <Link to="/login" className="btn btn-warning text-white">
-            Login
-          </Link>
+          {!user ? (
+            <>
+              <Link to="/register" className="btn btn-outline-warning">Register</Link>
+              <Link to="/login" className="btn btn-warning text-white">Login</Link>
+            </>
+          ) : (
+            <button onClick={handleLogout} className="btn btn-danger">Logout</button>
+          )}
         </div>
       </nav>
 
@@ -33,6 +57,9 @@ function Layout({ children }) {
           &copy; {new Date().getFullYear()} Easy<span className="text-warning">Booking</span>.com
         </small>
       </footer>
+
+      {/* Toast Container */}
+      <ToastContainer />
     </div>
   );
 }

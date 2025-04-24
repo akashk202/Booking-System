@@ -6,7 +6,7 @@ const User = require('../models/User');
 const upload = require('../middleware/upload');
 
 
-
+//Adding room(only for admin)
 router.post('/room', authenticateToken, checkAdmin, upload.single('image'), async (req, res) => {
   try {
     const { name, location, description, price, capacity } = req.body;
@@ -26,7 +26,7 @@ router.post('/room', authenticateToken, checkAdmin, upload.single('image'), asyn
     res.status(500).json({ message: err.message });
   }
 });
-
+//user details(only for admin)
 router.get('/users', authenticateToken, checkAdmin, async (req, res) => {
   try {
     const users = await User.find().select('-password');
@@ -35,6 +35,7 @@ router.get('/users', authenticateToken, checkAdmin, async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+//register new admin
 
 router.post('/register-admin', async (req, res) => {
   try {
@@ -54,7 +55,7 @@ router.post('/register-admin', async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-
+//room updation(only for admin)
 router.put('/room/:id', authenticateToken, checkAdmin, upload.single('image'), async (req, res) => {
   try {
     const { name, location, description, price, capacity } = req.body;
@@ -81,7 +82,7 @@ router.put('/room/:id', authenticateToken, checkAdmin, upload.single('image'), a
     res.status(500).json({ message: err.message });
   }
 });
-
+// added to access rooms in frontend
 router.get('/rooms', async (req, res) => {
   try {
     const rooms = await Room.find();
