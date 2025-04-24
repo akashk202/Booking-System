@@ -21,7 +21,10 @@ function Layout({ children }) {
     localStorage.removeItem('token');
     setUser(null); // Update context
     toast.success('Logged out successfully!');
-    navigate('/login');
+    
+    setTimeout(() =>{
+      navigate('/login');
+    },1500);
   };
 
   return (

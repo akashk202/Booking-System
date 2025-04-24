@@ -1,13 +1,12 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
-import { useAuth} from '../components/AuthContext';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../components/AuthContext';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Login() {
-  const {setUser} = useAuth();
+  const { setUser } = useAuth();
   const [formData, setFormData] = useState({ email: '', password: '' });
-  const [message, setMessage] = useState('');
-  const [variant, setVariant] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || '/dashboard';
@@ -20,8 +19,7 @@ function Login() {
     e.preventDefault();
 
     if (!formData.email || !formData.password) {
-      setVariant('danger');
-      setMessage('Please fill in both email and password');
+      toast.error('Please fill in both email and password', { autoClose: 2000 });
       return;
     }
 
@@ -47,17 +45,18 @@ function Login() {
         localStorage.setItem('user', JSON.stringify(user));
         setUser(user);
 
-        setVariant('success');
-        setMessage('Login successful! Redirecting...');
-        setTimeout(() => navigate(from), 1500);;
+        // ✅ FIRST show toast, then redirect *after* autoClose finishes
+        toast.success('Login successful! Redirecting...', {
+          autoClose: 2000,
+          onClose: () => navigate(from),
+        });
+
       } else {
-        setVariant('danger');
-        setMessage(data.message || 'Login failed');
+        toast.error(data.message || 'Login failed', { autoClose: 2000 });
       }
     } catch (err) {
       console.error('Error:', err);
-      setVariant('danger');
-      setMessage('Error connecting to server.');
+      toast.error('Error connecting to server.', { autoClose: 2000 });
     }
   };
 
@@ -71,12 +70,6 @@ function Login() {
         style={{ maxWidth: '400px', width: '100%' }}
       >
         <h3 className="text-center mb-4" style={{ color: '#343a40' }}>Login</h3>
-
-        {message && (
-          <div className={`alert alert-${variant}`} role="alert">
-            {message}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} noValidate>
           <div className="mb-3">
@@ -120,6 +113,19 @@ function Login() {
           </button>
         </form>
       </div>
+
+      {/* ✅ Toast Container with proper settings */}
+      <ToastContainer
+        position="top-center"
+        autoClose={2000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 }

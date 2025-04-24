@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -7,50 +9,58 @@ function Register() {
     phone: '',
     password: '',
   });
-  const [message, setMessage] = useState('');
-  const [variant, setVariant] = useState('');
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
-
-
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in)$/;
-    const phoneRegex = /^[0-9]{10}$/; 
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).{5,}$/;
-    const name = formData.name.trim(); 
-    const nameRegex = /^[A-Za-z][A-Za-z\s]{4,}$/;
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in)$/;
+  const phoneRegex = /^[0-9]{10}$/;
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).{5,}$/;
 
   const validateForm = () => {
-    const errors = {};
-    
-    if (!name) {
-      errors.name = "Name cannot be empty or just spaces.";
-    } else if (!nameRegex.test(name)) {
-      errors.name = "Name must be at least 5 characters, start with a letter, and only contain letters and spaces.";
-    } else if (/(\w)\1\1/.test(name)) {
-      errors.name = "Name cannot contain the same character repeated 3 times in a row.";
-    }
-  
-    if (!formData.email || !emailRegex.test(formData.email)) {
-      errors.email = "Invalid email format.";
-    }
-  
-    if (!formData.phone || !phoneRegex.test(formData.phone)) {
-      errors.phone = "Phone must contain only numbers.";
-    }
-  
-    if (!formData.password || !passwordRegex.test(formData.password)) {
-      errors.password = "Password must be at least 5 characters long, include letters, a number, and a symbol.";
-    }
-  
-    if (Object.keys(errors).length > 0) {
-      // Optional: Set error messages in state
-      setMessage(Object.values(errors)[0]); // Show the first error
-      setVariant('danger');
+    const { name, email, phone, password } = formData;
+    const trimmedName = name.trim();
+
+    if (!trimmedName && !email && !phone && !password) {
+      toast.error("All fields must be filled.");
       return false;
     }
-  
+
+    if (!trimmedName) {
+      toast.error("Name cannot be empty or just spaces.");
+      return false;
+    } else if (/^\s/.test(name)) {
+      toast.error("Name cannot start with a blank space.");
+      return false;
+    } else if (!/^[A-Za-z]/.test(trimmedName)) {
+      toast.error("Name must start with a letter.");
+      return false;
+    } else if (/\d/.test(trimmedName)) {
+      toast.error("Name cannot contain numbers.");
+      return false;
+    } else if (!/^[A-Za-z\s]{5,}$/.test(trimmedName)) {
+      toast.error("Name must be at least 5 characters and contain only letters and spaces.");
+      return false;
+    } else if (/(\w)\1\1/.test(trimmedName)) {
+      toast.error("Name cannot contain the same character repeated 3 times in a row.");
+      return false;
+    }
+
+    if (!email || !emailRegex.test(email)) {
+      toast.error("Invalid email format.");
+      return false;
+    }
+
+    if (!phone || !phoneRegex.test(phone)) {
+      toast.error("Phone must contain only numbers.");
+      return false;
+    }
+
+    if (!password || !passwordRegex.test(password)) {
+      toast.error("Password must be at least 5 characters long, include letters, a number, and a symbol.");
+      return false;
+    }
+
     return true;
   };
 
@@ -69,15 +79,12 @@ function Register() {
 
       if (res.ok) {
         localStorage.setItem('token', data.token);
-        setVariant('success');
-        setMessage('Registration successful!');
+        toast.success('Registration successful!');
       } else {
-        setVariant('danger');
-        setMessage(data.message || 'Registration failed');
+        toast.error(data.message || 'Registration failed');
       }
     } catch (err) {
-      setVariant('danger');
-      setMessage('Error connecting to the server.');
+      toast.error('Error connecting to the server.');
     }
   };
 
@@ -92,11 +99,7 @@ function Register() {
       >
         <h3 className="text-center mb-4" style={{ color: '#343a40' }}>Register</h3>
 
-        {message && (
-          <div className={`alert alert-${variant}`} role="alert">
-            {message}
-          </div>
-        )}
+        <ToastContainer position="top-center" autoClose={3000} />
 
         <form onSubmit={handleSubmit} noValidate>
           <div className="mb-3">
