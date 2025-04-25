@@ -11,6 +11,8 @@ import Booking from './components/Booking';
 import ProtectedRoute from './components/ProtectedRoute';
 import UpdateProfile from './components/UpdateProfile';
 import { AuthProvider } from './components/AuthContext';
+import Profile from './components/Profile';
+import MyBookings from './components/MyBookings';
 
 function App() {
   return (
@@ -30,6 +32,8 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="/Profile" element={<Profile />} />
+            <Route path="/my-bookings" element={<MyBookings />} />
             <Route path="/update-profile" element={<UpdateProfile />} />
             <Route
               path="/booking"

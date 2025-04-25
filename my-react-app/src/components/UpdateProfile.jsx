@@ -11,7 +11,7 @@ function UpdateProfile() {
   useEffect(() => {
     const fetchProfile = async () => {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:3000/api/users/profile', {
+      const res = await fetch('http://localhost:3000/api/user/profile', {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -29,7 +29,7 @@ function UpdateProfile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
-    const res = await fetch('http://localhost:3000/api/users', {
+    const res = await fetch('http://localhost:3000/api/user', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

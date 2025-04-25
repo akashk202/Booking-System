@@ -47,7 +47,7 @@ function Login() {
 
         // ✅ FIRST show toast, then redirect *after* autoClose finishes
         toast.success('Login successful! Redirecting...', {
-          autoClose: 2000,
+          autoClose: 500,
           onClose: () => navigate(from),
         });
 
@@ -117,7 +117,7 @@ function Login() {
       {/* ✅ Toast Container with proper settings */}
       <ToastContainer
         position="top-center"
-        autoClose={2000}
+        autoClose={1000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick

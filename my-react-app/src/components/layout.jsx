@@ -5,10 +5,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useAuth } from '../components/AuthContext';
 
 function Layout({ children }) {
-  const { user, setUser } = useAuth(); // Get user and setUser from context
+  const { user, setUser } = useAuth();
   const navigate = useNavigate();
 
-  // Optional: Load user from localStorage on initial render
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser && !user) {
@@ -19,12 +18,11 @@ function Layout({ children }) {
   const handleLogout = () => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    setUser(null); // Update context
-    toast.success('Logged out successfully!');
-    
-    setTimeout(() =>{
-      navigate('/login');
-    },1500);
+    setUser(null);
+    toast.success('Logged out successfully!', {
+      autoClose: 1000,  
+      onClose: () => navigate('/login'), 
+    });
   };
 
   return (
@@ -35,19 +33,42 @@ function Layout({ children }) {
           Easy<span className="text-warning">Booking</span>.com
         </Link>
 
-        <div className="ms-auto d-flex gap-3">
+        <div className="ms-auto d-flex gap-3 align-items-center">
           {!user ? (
             <>
               <Link to="/register" className="btn btn-outline-warning">Register</Link>
               <Link to="/login" className="btn btn-warning text-white">Login</Link>
             </>
           ) : (
-            <button onClick={handleLogout} className="btn btn-danger">Logout</button>
+            <div className="dropdown">
+              <button
+                className="btn btn-warning rounded-circle d-flex align-items-center justify-content-center"
+                type="button"
+                id="userDropdown"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                style={{ width: '40px', height: '40px' }}
+              >
+                <span className="fw-bold text-white">{user.role[0].toUpperCase()}</span>
+              </button>
+              <ul className="dropdown-menu dropdown-menu-end mt-2" aria-labelledby="userDropdown">
+                <li>
+                  <Link className="dropdown-item" to="/profile">Your Info</Link>
+                </li>
+                <li>
+                  <Link className="dropdown-item" to="/my-bookings">Your Bookings</Link>
+                </li>
+                <li><hr className="dropdown-divider" /></li>
+                <li>
+                  <button className="dropdown-item text-danger" onClick={handleLogout}>Logout</button>
+                </li>
+              </ul>
+            </div>
           )}
         </div>
       </nav>
 
-      {/* Main content */}
+      {/* Main Content */}
       <main className="flex-grow-1 d-flex justify-content-center align-items-center p-4">
         <div className="container text-center">
           {children}
@@ -62,7 +83,7 @@ function Layout({ children }) {
       </footer>
 
       {/* Toast Container */}
-      <ToastContainer />
+      <ToastContainer position="top-center" autoClose={2000} />
     </div>
   );
 }

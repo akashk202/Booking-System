@@ -12,7 +12,7 @@ router.get('/check-availability', authenticateToken, async (req, res) => {
       return res.status(400).json({ message: 'roomId, dateFrom, and dateTo are required' });
     }
 
-    //vvalidation
+    //validation
     const startDate = new Date(dateFrom);
     const endDate = new Date(dateTo);
 

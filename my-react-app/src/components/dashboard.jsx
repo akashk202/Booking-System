@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+// ✅ Importing toast from react-toastify
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 function Dashboard() {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
-  const [formData, setFormData] = useState({ name: '', phone: '', address: '', password: '' });
-  const [updateMessage, setUpdateMessage] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,29 +20,21 @@ function Dashboard() {
     }
   }, []);
 
+  // ✅ Adding a separate useEffect for triggering the toast once the user is set
   useEffect(() => {
-    if (user) {
-      fetchProfile();
-      if (user.role === 'user') fetchRooms();
+    if (user && user.name) {
+      toast.success(`Welcome, ${user.name}!`, {
+        position: 'top-right',
+        autoClose: 3000,
+      });
     }
   }, [user]);
 
-  const fetchProfile = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:3000/api/user/profile', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setFormData({ name: data.name, phone: data.phone || '', address: data.address || '', password: '' });
-      } else {
-        console.error('Failed to fetch profile');
-      }
-    } catch (error) {
-      console.error('Error fetching profile:', error);
+  useEffect(() => {
+    if (user) {
+      if (user.role === 'user') fetchRooms();
     }
-  };
+  }, [user]);
 
   const fetchRooms = async () => {
     try {
@@ -65,78 +59,23 @@ function Dashboard() {
     }
   };
 
-  const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-    try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:3000/api/users', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (res.ok) {
-        const updated = await res.json();
-        setUpdateMessage('Profile updated successfully!');
-      } else {
-        setUpdateMessage('Failed to update profile.');
-      }
-    } catch (error) {
-      console.error('Update error:', error);
-      setUpdateMessage('An error occurred while updating profile.');
-    }
-  };
-
   return (
     <div className="container mt-5">
-      <h2>Welcome to the Dashboard!</h2>
+      {/* ✅ Add ToastContainer here to render toasts */}
+      <ToastContainer />
 
       {user ? (
         <>
-          <p>Logged in as <strong>{user.role}</strong></p>
+          {/* ❌ Removed: Welcome to the Dashboard and Logged in as... */}
 
-          {/* Profile Update Form */}
-          <div className="card mt-4">
-            <div className="card-body">
-              <h4 className="card-title">Update Profile</h4>
-              <form onSubmit={handleUpdate}>
-                <div className="mb-3">
-                  <label className="form-label">Name</label>
-                  <input type="text" name="name" className="form-control" value={formData.name} onChange={handleChange} />
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">Phone</label>
-                  <input type="text" name="phone" className="form-control" value={formData.phone} onChange={handleChange} />
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">Address</label>
-                  <input type="text" name="address" className="form-control" value={formData.address} onChange={handleChange} />
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">Password</label>
-                  <input type="password" name="password" className="form-control" value={formData.password} onChange={handleChange} />
-                </div>
-                <button type="submit" className="btn btn-warning">Update Profile</button>
-              </form>
-              {updateMessage && <p className="mt-3">{updateMessage}</p>}
-            </div>
-          </div>
-
-          {/* Admin Panel Link */}
+          {/* ✅ Admin Panel Button */}
           {user.role === 'admin' && (
             <div className="mt-4">
               <Link to="/admin" className="btn btn-warning">Go to Admin Panel</Link>
             </div>
           )}
 
-          {/* User Rooms Display */}
+          {/* ✅ User Room Display */}
           {user.role === 'user' && (
             <div className="mt-5">
               <h4>Available Rooms</h4>

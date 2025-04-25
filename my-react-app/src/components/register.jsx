@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useAuth } from '../components/AuthContext';
+
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -9,6 +11,7 @@ function Register() {
     phone: '',
     password: '',
   });
+  const { setUser } = useAuth();
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -76,10 +79,25 @@ function Register() {
       });
 
       const data = await res.json();
+      
 
       if (res.ok) {
-        localStorage.setItem('token', data.token);
-        toast.success('Registration successful!');
+        const token = data.token;
+        const payload = JSON.parse(atob(token.split('.')[1])); // decode JWT
+  
+        const user = {
+          id: payload.id,
+          role: payload.role,
+        };
+  
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
+        setUser(user);
+  
+        toast.success('Registration successful! Redirecting to dashboard...', {
+          autoClose: 1000,
+          onClose: () => window.location.href = '/dashboard',
+        });
       } else {
         toast.error(data.message || 'Registration failed');
       }
@@ -87,7 +105,6 @@ function Register() {
       toast.error('Error connecting to the server.');
     }
   };
-
   return (
     <div
       className="container d-flex justify-content-center align-items-center"
