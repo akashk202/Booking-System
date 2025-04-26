@@ -56,8 +56,12 @@ function Layout({ children }) {
                   <Link className="dropdown-item" to="/profile">Your Info</Link>
                 </li>
                 <li>
-                  <Link className="dropdown-item" to="/my-bookings">Your Bookings</Link>
-                </li>
+                {user.role === 'admin' ? (
+                    <Link className="dropdown-item" to="/all-bookings">All Bookings</Link>) : (
+                      <Link className="dropdown-item" to="/my-bookings">Your Bookings</Link>
+                       )}
+                    </li>
+
                 <li><hr className="dropdown-divider" /></li>
                 <li>
                   <button className="dropdown-item text-danger" onClick={handleLogout}>Logout</button>
