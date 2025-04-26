@@ -1,13 +1,16 @@
 import React, { useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useAuth } from '../components/AuthContext';
+import { Link, useNavigate } from 'react-router-dom';
+
+
+
 
 function Layout({ children }) {
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
-
+  
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser && !user) {
@@ -19,10 +22,12 @@ function Layout({ children }) {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
     setUser(null);
-    toast.success('Logged out successfully!', {
-      autoClose: 1000,  
-      onClose: () => navigate('/login'), 
-    });
+  
+    toast.success('Logged out successfully!');
+  
+    setTimeout(() => {
+      navigate('/login');
+    }, 1000); // Wait for 1 second to let the toast show
   };
 
   return (
