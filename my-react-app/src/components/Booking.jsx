@@ -1,69 +1,52 @@
 import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 function Booking() {
-  const [rooms, setRooms] = useState([]);
+  const location = useLocation();
+  const selectedRoom = location.state?.room;
+
   const [bookings, setBookings] = useState([]);
-  const [form, setForm] = useState({ roomId: '', startDate: '', endDate: '', guests: 1 });
+  const [form, setForm] = useState({ startDate: '', endDate: '', guests: 1 });
   const [availability, setAvailability] = useState(null);
   const [message, setMessage] = useState('');
 
   const token = localStorage.getItem('token');
 
   useEffect(() => {
-    fetchRooms();
+    if (!selectedRoom) {
+      setMessage('No room selected. Please choose a room from the dashboard.');
+      return;
+    }
+
     if (token) {
       fetchBookings();
     } else {
       setMessage('Please log in to view and make bookings.');
     }
-  }, [token]);
-
-  const fetchRooms = async () => {
-    try {
-      const res = await fetch('http://localhost:3000/api/rooms');
-      if (!res.ok) {
-        const error = await res.json();
-        console.error('Error fetching rooms:', error.message);
-        return;
-      }
-      const data = await res.json();
-      setRooms(data);
-    } catch (err) {
-      console.error('Error fetching rooms:', err.message);
-    }
-  };
+  }, [token, selectedRoom]);
 
   const fetchBookings = async () => {
-    if (!token) {
-      setMessage('Please log in to view and make bookings.');
-      return;
-    }
-  
     try {
       const res = await fetch('http://localhost:3000/api/bookings', {
         headers: { Authorization: `Bearer ${token}` },
       });
-  
-      if (!res.ok) {
-        const error = await res.json();
-        console.error('Failed to fetch bookings:', error.message);
-        setMessage(error.message || 'Failed to fetch bookings.');
-        return;
-      }
-  
       const data = await res.json();
-      setBookings(data);
+      if (res.ok) {
+        setBookings(data);
+      } else {
+        setMessage(data.message || 'Failed to fetch bookings.');
+      }
     } catch (err) {
       console.error('Error fetching bookings:', err.message);
-      setMessage('Error fetching bookings. Please try again later.');
+      setMessage('Error fetching bookings.');
     }
   };
 
   const checkAvailability = async () => {
-    const { roomId, startDate, endDate } = form;
+    const { startDate, endDate } = form;
 
-    if (!roomId || !startDate || !endDate) {
-      setMessage('Please fill out all fields before checking availability.');
+    if (!startDate || !endDate) {
+      setMessage('Please fill out all fields.');
       return;
     }
 
@@ -74,26 +57,21 @@ function Booking() {
 
     try {
       const res = await fetch(
-        `http://localhost:3000/api/bookings/check-availability?roomId=${roomId}&startDate=${startDate}&endDate=${endDate}`
+        `http://localhost:3000/api/bookings/check-availability?roomId=${selectedRoom._id}&startDate=${startDate}&endDate=${endDate}`
       );
-
       const data = await res.json();
       setAvailability(data.available);
-      if (data.available) {
-        setMessage('Room is available!');
-      } else {
-        setMessage('Room is not available for the selected dates.');
-      }
+      setMessage(data.available ? 'Room is available!' : 'Room is not available.');
     } catch (err) {
       console.error('Error checking availability:', err.message);
-      setMessage('Error checking availability. Please try again later.');
+      setMessage('Error checking availability.');
     }
   };
 
   const handleBooking = async () => {
-    const { roomId, startDate, endDate, guests } = form;
+    const { startDate, endDate, guests } = form;
 
-    if (!roomId || !startDate || !endDate || guests <= 0) {
+    if (!startDate || !endDate || guests <= 0) {
       setMessage('Please fill out all fields before booking.');
       return;
     }
@@ -105,7 +83,7 @@ function Booking() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ roomId: selectedRoom._id, startDate, endDate, guests }),
       });
 
       const data = await res.json();
@@ -113,22 +91,19 @@ function Booking() {
         setMessage('Booking successful!');
         fetchBookings();
       } else {
-        setMessage(data.message || 'Booking failed. Please try again.');
+        setMessage(data.message || 'Booking failed.');
       }
     } catch (err) {
       console.error('Error creating booking:', err.message);
-      setMessage('Error creating booking. Please try again later.');
+      setMessage('Error creating booking.');
     }
   };
-  
 
   const cancelBooking = async (id) => {
     try {
       const res = await fetch(`http://localhost:3000/api/bookings/${id}`, {
         method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (res.ok) {
@@ -139,31 +114,15 @@ function Booking() {
       }
     } catch (err) {
       console.error('Error cancelling booking:', err.message);
-      setMessage('Error cancelling booking. Please try again later.');
+      setMessage('Error cancelling booking.');
     }
   };
 
   return (
     <div className="container mt-4">
-      <h2 className="text-warning">Book a Room</h2>
+      <h2 className="text-warning">Book: {selectedRoom?.name || 'Room'}</h2>
 
       <div className="card p-4 mb-4">
-        <div className="form-group">
-          <label>Select Room</label>
-          <select
-            className="form-control"
-            value={form.roomId}
-            onChange={(e) => setForm({ ...form, roomId: e.target.value })}
-          >
-            <option value="">Choose a room</option>
-            {rooms.map((room) => (
-              <option key={room._id} value={room._id}>
-                {room.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
         <div className="form-group mt-3">
           <label>Start Date</label>
           <input
@@ -189,8 +148,8 @@ function Booking() {
           <input
             type="number"
             className="form-control"
-            value={form.guests}
             min={1}
+            value={form.guests}
             onChange={(e) => setForm({ ...form, guests: parseInt(e.target.value) })}
           />
         </div>
@@ -216,17 +175,17 @@ function Booking() {
       <h3 className="text-warning">My Bookings</h3>
       <ul className="list-group">
         {bookings.map((b) => (
-    <li key={b._id} className="list-group-item d-flex justify-content-between align-items-center">
-      <div>
-        <strong>{b.roomId?.name || 'N/A'}</strong> from <b>{b.startDate?.slice(0, 10) || 'N/A'}</b> to{' '}
-        <b>{b.endDate?.slice(0, 10) || 'N/A'}</b> | Guests: {b.guests}
-      </div>
-      <button className="btn btn-sm btn-outline-danger" onClick={() => cancelBooking(b._id)}>
-        Cancel
-      </button>
-    </li>
-  ))}
-</ul>
+          <li key={b._id} className="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <strong>{b.roomId?.name || 'N/A'}</strong> from <b>{b.startDate?.slice(0, 10)}</b> to{' '}
+              <b>{b.endDate?.slice(0, 10)}</b> | Guests: {b.guests}
+            </div>
+            <button className="btn btn-sm btn-outline-danger" onClick={() => cancelBooking(b._id)}>
+              Cancel
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
