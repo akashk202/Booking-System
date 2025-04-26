@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from "./AuthContext";  
 import { useNavigate } from 'react-router-dom';
+import './css/Profile.css'
 
 function Profile() {
   const { user } = useAuth();
@@ -30,25 +31,19 @@ function Profile() {
   }, [user]);
 
   return (
-    <div className="container my-5">
-      <div className="card shadow p-4" style={{ maxWidth: '600px', margin: 'auto' }}>
-        <h4 className="mb-3 text-center">Profile</h4>
-        {userInfo ? (
-          <div>
-            <p><strong>Email:</strong> {userInfo.email}</p>
-            <p><strong>Registered At:</strong> {new Date(userInfo.createdAt).toLocaleString()}</p>
-
-            <button
-              className="btn btn-warning text-white mt-3"
-              onClick={() => navigate('/update-profile')}
-            >
-              Update Profile
-            </button>
-          </div>
-        ) : (
-          <p>Loading user info...</p>
-        )}
-      </div>
+    <div className="profile-card">
+  <h4 className="mb-3 text-center">Profile</h4>
+  {userInfo ? (
+    <>
+      <p><strong>Email:</strong> {userInfo.email}</p>
+      <p><strong>Registered At:</strong> {new Date(userInfo.createdAt).toLocaleString()}</p>
+      <button onClick={() => navigate('/update-profile')}>
+        Update Profile
+      </button>
+    </>
+  ) : (
+    <p>Loading user info...</p>
+  )}
     </div>
   );
 }

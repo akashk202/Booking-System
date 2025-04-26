@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './css/UpdateProfile.css';
 
 function UpdateProfile() {
   const [formData, setFormData] = useState({
@@ -47,10 +48,10 @@ function UpdateProfile() {
   };
 
   return (
-    <div className="container mt-5">
-      <h3>Update Your Profile</h3>
-      {message && <p>{message}</p>}
-      <form onSubmit={handleSubmit}>
+    <div className="update-profile-container">
+    <h3>Update Your Profile</h3>
+    {message && <p>{message}</p>}
+    <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label>Name</label>
           <input type="text" name="name" className="form-control" value={formData.name} onChange={handleChange} />

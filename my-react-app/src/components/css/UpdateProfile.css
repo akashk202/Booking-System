@@ -1,0 +1,65 @@
+/* UpdateProfile.css */
+
+.update-profile-container {
+    max-width: 600px;
+    margin: 4rem auto;
+    background: #fffbe6;
+    padding: 2.5rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    border: 2px solid #ffcc00;
+  }
+  
+  .update-profile-container h3 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 2rem;
+    font-weight: bold;
+  }
+  
+  .update-profile-container label {
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+    display: block;
+    color: #222;
+  }
+  
+  .update-profile-container input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 0.75rem;
+    margin-bottom: 1rem;
+    transition: border 0.3s;
+    background-color: #fff;
+  }
+  
+  .update-profile-container input:focus {
+    border-color: #ffcc00;
+    outline: none;
+    box-shadow: 0 0 5px #ffcc00aa;
+  }
+  
+  .update-profile-container .btn {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    background-color: #ffcc00;
+    border: none;
+    border-radius: 0.75rem;
+    color: #000;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+  }
+  
+  .update-profile-container .btn:hover {
+    background-color: #e6b800;
+  }
+  
+  .update-profile-container p {
+    text-align: center;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    color: green;
+  }
+  

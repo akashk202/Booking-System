@@ -64,7 +64,7 @@ function Layout({ children }) {
 
                 <li><hr className="dropdown-divider" /></li>
                 <li>
-                  <button className="dropdown-item text-danger" onClick={handleLogout}>Logout</button>
+                <button className="dropdown-item text-danger" onClick={handleLogout}>Logout</button>
                 </li>
               </ul>
             </div>
