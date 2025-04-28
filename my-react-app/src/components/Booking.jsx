@@ -17,16 +17,16 @@ export default function Booking() {
   const [availability, setAvailability] = useState(null);
   const [loading, setLoading] = useState(false);
   const [bookingLoading, setBookingLoading] = useState(false);
-  const [message, setMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   const token = localStorage.getItem('token');
   const API = 'http://localhost:3000/api/bookings';
 
-  // Number of nights between dates
+  // compute nights
   const computeNights = () => {
     if (!startDate || !endDate) return 0;
-    const msPerDay = 1000 * 60 * 60 * 24;
-    return Math.ceil((endDate - startDate) / msPerDay);
+    const msDay = 1000 * 60 * 60 * 24;
+    return Math.ceil((endDate - startDate) / msDay);
   };
 
   useEffect(() => {
@@ -46,10 +46,10 @@ export default function Booking() {
       });
       const data = await res.json();
       if (res.ok) setBookings(data);
-      else toast.error(data.message || 'Failed to fetch bookings.');
+      else toast.error(data.message);
     } catch (err) {
-      console.error(err);
       toast.error('Error fetching bookings.');
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -57,12 +57,12 @@ export default function Booking() {
 
   const checkAvailability = async () => {
     if (!startDate || !endDate || startDate >= endDate) {
-      toast.error('Please select a valid date range.');
-      return;
+      return toast.error('Please select a valid date range.');
     }
     setLoading(true);
     try {
-      const url = `${API}/check-availability?roomId=${selectedRoom._id}` +
+      const url = `${API}/check-availability` +
+                  `?roomId=${selectedRoom._id}` +
                   `&dateFrom=${startDate.toISOString()}` +
                   `&dateTo=${endDate.toISOString()}`;
       const res = await fetch(url, {
@@ -71,15 +71,15 @@ export default function Booking() {
       const data = await res.json();
       if (res.ok) {
         setAvailability(data.available);
-        toast.success(data.available
-          ? 'Room is available!'
-          : 'Room is not available.');
+        toast[data.available ? 'success' : 'error'](
+          data.available ? 'Room is available!' : 'Room is not available.'
+        );
       } else {
-        toast.error(data.message || 'Failed to check availability.');
+        toast.error(data.message);
       }
     } catch (err) {
-      console.error(err);
       toast.error('Error checking availability.');
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -87,13 +87,11 @@ export default function Booking() {
 
   const handleBooking = async () => {
     if (!availability) {
-      toast.error('Please check availability first.');
-      return;
+      return toast.error('Please check availability first.');
     }
     const nights = computeNights();
     if (!nights || guests < 1) {
-      toast.error('Invalid booking details.');
-      return;
+      return toast.error('Invalid booking details.');
     }
     setBookingLoading(true);
     try {
@@ -107,7 +105,7 @@ export default function Booking() {
         body: JSON.stringify({
           roomId: selectedRoom._id,
           dateFrom: startDate.toISOString(),
-          dateTo:   endDate.toISOString(),
+          dateTo: endDate.toISOString(),
           guests,
           totalAmount,
           specialRequests
@@ -115,19 +113,20 @@ export default function Booking() {
       });
       const data = await res.json();
       if (res.ok) {
-        toast.success('Booking successful!');
-        // reset
+        // show in-page success
+        setSuccessMessage('Booking successful!');
+        // reset form & reload
         setAvailability(null);
         setStartDate(null);
         setEndDate(null);
         setSpecialRequests('');
         fetchBookings();
       } else {
-        toast.error(data.message || 'Booking failed.');
+        toast.error(data.message);
       }
     } catch (err) {
-      console.error(err);
       toast.error('Error creating booking.');
+      console.error(err);
     } finally {
       setBookingLoading(false);
     }
@@ -146,18 +145,32 @@ export default function Booking() {
         toast.error('Failed to cancel booking.');
       }
     } catch (err) {
-      console.error(err);
       toast.error('Error cancelling booking.');
+      console.error(err);
     }
   };
 
   return (
     <div className="container mt-5">
-      <ToastContainer />
+      {/* Global toast container, 1s auto-close, one at a time */}
+      <ToastContainer 
+        position="top-center" 
+        autoClose={1000}
+        limit={1}
+      />
+
       <h2 className="text-center mb-4 text-warning">
         Book: {selectedRoom?.name || 'Room'}
       </h2>
 
+      {/* In-page success banner */}
+      {successMessage && (
+        <div className="alert alert-success text-center">
+          {successMessage}
+        </div>
+      )}
+
+      {/* Booking form */}
       <div className="card shadow p-4 mb-5">
         <div className="row g-3">
           <div className="col-md-3">
@@ -220,6 +233,7 @@ export default function Booking() {
         </div>
       </div>
 
+      {/* Existing bookings */}
       <h3 className="text-warning mb-3">My Bookings</h3>
       {loading ? (
         <div className="text-center">Loading bookings…</div>
@@ -231,7 +245,7 @@ export default function Booking() {
               className="list-group-item d-flex justify-content-between align-items-center"
             >
               <div>
-                <strong>{b.roomId?.name || 'Room'}</strong> |{' '}
+                <strong>{b.roomId?.name}</strong> |{' '}
                 {new Date(b.dateFrom).toLocaleDateString()} →{' '}
                 {new Date(b.dateTo).toLocaleDateString()} | Guests: {b.guests}
               </div>
