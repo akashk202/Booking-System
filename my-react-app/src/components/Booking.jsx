@@ -133,16 +133,25 @@ export default function Booking() {
   };
 
   const cancelBooking = async (id) => {
+    if (!window.confirm('Are you sure you want to cancel this booking?')) return;
     try {
-      const res = await fetch(`${API}/${id}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
+      const res = await fetch(`${API}/bookings/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          status: 'cancelled',
+          paymentStatus: 'refunded',
+        }),
       });
       if (res.ok) {
         toast.success('Booking cancelled.');
         fetchBookings();
       } else {
-        toast.error('Failed to cancel booking.');
+        const data = await res.json();
+        toast.error(data.message || 'Failed to cancel booking.');
       }
     } catch (err) {
       toast.error('Error cancelling booking.');
@@ -249,12 +258,15 @@ export default function Booking() {
                 {new Date(b.dateFrom).toLocaleDateString()} →{' '}
                 {new Date(b.dateTo).toLocaleDateString()} | Guests: {b.guests}
               </div>
-              <button
+              {b.status !== 'cancelled' && (
+            <button
                 className="btn btn-sm btn-outline-danger"
-                onClick={() => cancelBooking(b._id)}
-              >
-                Cancel
+                onClick={() => cancelBooking(b._id)}>Cancel
               </button>
+            )}
+            {b.status === 'cancelled' && (
+          <span className="badge bg-danger">Cancelled</span>
+            )}
             </li>
           ))}
         </ul>

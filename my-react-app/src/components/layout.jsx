@@ -61,11 +61,15 @@ function Layout({ children }) {
                   <Link className="dropdown-item" to="/profile">Your Info</Link>
                 </li>
                 <li>
-                {user.role === 'admin' ? (
-                    <Link className="dropdown-item" to="/all-bookings">All Bookings</Link>) : (
-                      <Link className="dropdown-item" to="/my-bookings">Your Bookings</Link>
-                       )}
-                    </li>
+              {user.role === 'admin' ? (
+              <>
+                <Link className="dropdown-item" to="/all-bookings">All Bookings</Link>
+                <Link className="dropdown-item" to="/admin">Admin Panel</Link> {/* 👈 Add this */}
+                </>
+              ) : (
+                  <Link className="dropdown-item" to="/my-bookings">Your Bookings</Link>
+                 )}
+              </li>
 
                 <li><hr className="dropdown-divider" /></li>
                 <li>
